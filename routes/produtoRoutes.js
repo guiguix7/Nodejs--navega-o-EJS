@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const produtos = [
-  { id: 1, nome: 'Notebook', descricao: 'Notebook para uso profissional', preco: 3500, estoque: 10, categoria: 'Informática' },
-  { id: 2, nome: 'Caderno', descricao: 'Caderno premium para escritório', preco: 45, estoque: 30, categoria: 'Escritório' }
+  { id: 1, nome: 'Relogio', descricao: 'Relógio pra ver as horas', preco: 3500, estoque: 10, categoria: 'Horario' },
+  { id: 2, nome: 'Fone de ouvido', descricao: 'Fone de ouvido para ouvir musicas', preco: 245, estoque: 30, categoria: 'Acessórios' }
 ];
 
 router.get('/', (req, res) => {

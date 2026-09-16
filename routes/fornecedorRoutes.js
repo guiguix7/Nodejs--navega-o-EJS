@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const fornecedores = [
-  { id: 1, razaoSocial: 'Tech Supply LTDA', cnpj: '12.345.678/0001-99', email: 'contato@techsupply.com', telefone: '(31) 3333-4444', cidade: 'Belo Horizonte' },
-  { id: 2, razaoSocial: 'Mercado Norte', cnpj: '98.765.432/0001-88', email: 'atendimento@mercadonorte.com', telefone: '(47) 3222-5566', cidade: 'Florianópolis' }
+  { id: 1, razaoSocial: 'Amazon', cnpj: '6767676767', email: 'saboraidentro@email.com', telefone: '67 67676767', cidade: 'Rua Belterra 291 Santo Amaro Sp' },
+  { id: 2, razaoSocial: 'Mercado Preso', cnpj: '6767676767', email: 'emeailtuff@email.com', telefone: '67 676767', cidade: 'Rua Zé Pilintra 6742' }
 ];
 
 router.get('/', (req, res) => {
