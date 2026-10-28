@@ -112,34 +112,6 @@ A IA foi utilizada como apoio para revisar a estrutura existente, identificar op
 - Revisões ou correções realizadas pelo grupo: `[descrever]`
 - Pessoa responsável e data: `[preencher]`
 
-## Prints da conversa com a IA
-
-Inserir nesta seção capturas reais da conversa que mostrem o prompt, as recomendações e as revisões feitas pelo grupo. Não foram inventadas capturas de conversa.
-
-- `[PENDENTE]` `docs/evidencias/conversa-ia-01.png` — prompt/recomendações.
-- `[PENDENTE]` `docs/evidencias/conversa-ia-02.png` — revisão e validação do resultado.
-
-## Antes da reestilização
-
-As duas imagens abaixo foram fornecidas junto ao projeto e registram a interface anterior.
-
-### Página inicial original
-
-![Página inicial antes da reestilização](docs/evidencias/antes-pagina-inicial.png)
-
-### Listagem de clientes original
-
-![Listagem de clientes antes da reestilização](docs/evidencias/antes-listagem-clientes.png)
-
-## Depois da reestilização
-
-**Captura real ainda pendente.** Depois de iniciar a versão atualizada no navegador, capture a página inicial e uma listagem e salve-as como:
-
-- `docs/evidencias/depois-pagina-inicial.png`
-- `docs/evidencias/depois-listagem-clientes.png`
-
-Não há captura “depois” incluída nesta entrega, pois a versão atual não pôde ser executada visualmente neste ambiente sem as dependências instaladas.
-
 ## Aplicação e repositório
 
 - **Aplicação publicada:** https://nodejs-navega-o-ejs.vercel.app/
