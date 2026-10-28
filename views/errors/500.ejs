@@ -1,0 +1,4 @@
+<%- include('../partials/head', { title: 'Erro inesperado' }) %>
+<%- include('../partials/nav') %>
+<main class="container page-shell error-shell"><div class="error-card"><div class="error-code">500</div><div class="heading-icon mx-auto"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></div><h1>Não foi possível concluir</h1><p><%= message || 'Ocorreu um erro inesperado. Tente novamente.' %></p><a href="/" class="btn btn-primary"><i class="bi bi-arrow-clockwise me-2" aria-hidden="true"></i>Voltar ao início</a></div></main>
+<%- include('../partials/foot') %>

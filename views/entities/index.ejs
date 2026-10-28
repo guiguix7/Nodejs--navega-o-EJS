@@ -1,0 +1,59 @@
+<%- include('../partials/head', { title: config.title }) %>
+<%- include('../partials/nav') %>
+<main class="container page-shell">
+  <nav aria-label="breadcrumb" class="page-breadcrumb"><a href="/"><i class="bi bi-house-door me-1" aria-hidden="true"></i>Início</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span><%= config.title %></span></nav>
+  <section class="page-heading">
+    <div class="heading-title-wrap"><div class="heading-icon"><i class="bi <%= config.icon %>" aria-hidden="true"></i></div><div><span class="eyebrow">GERENCIAMENTO</span><h1><%= config.title %></h1><p><%= config.description %></p></div></div>
+    <a class="btn btn-primary btn-new" href="<%= config.path %>/cadastro"><i class="bi bi-plus-lg me-2" aria-hidden="true"></i>Novo <%= config.singular %></a>
+  </section>
+
+  <% if (success) { %><div class="alert alert-success app-alert" role="status"><i class="bi bi-check-circle-fill me-2" aria-hidden="true"></i><%= success %></div><% } %>
+  <% if (notice) { %><div class="alert alert-info app-alert" role="status"><i class="bi bi-info-circle-fill me-2" aria-hidden="true"></i><%= notice %></div><% } %>
+
+  <section class="data-panel">
+    <div class="data-panel-header">
+      <div><h2>Registros cadastrados</h2><p><%= records.length %> <%= records.length === 1 ? 'resultado' : 'resultados' %><%= query ? ` para “${query}”` : '' %></p></div>
+      <form class="search-form" action="<%= config.path %>" method="GET" role="search">
+        <label class="visually-hidden" for="searchRecords">Pesquisar registros</label>
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="searchRecords" type="search" name="q" value="<%= query %>" placeholder="Pesquisar..." autocomplete="off">
+        <% if (query) { %><a class="search-clear" href="<%= config.path %>" aria-label="Limpar pesquisa"><i class="bi bi-x-lg"></i></a><% } %>
+        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+      </form>
+    </div>
+
+    <% if (records.length) { %>
+      <div class="table-responsive records-table-wrap">
+        <table class="table records-table align-middle">
+          <thead><tr><% config.columns.forEach((column) => { %><th class="<%= column.compact ? 'column-compact' : '' %>" scope="col"><%= column.label %></th><% }) %><th class="actions-column" scope="col">Ações</th></tr></thead>
+          <tbody>
+            <% records.forEach((record) => { %>
+              <tr>
+                <% config.columns.forEach((column) => { %>
+                  <td class="<%= column.compact ? 'column-compact' : '' %>">
+                    <% if (column.key === 'id') { %><span class="record-id">#<%= record.id %></span>
+                    <% } else if (column.format === 'currency') { %><span class="price-value"><%= new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(record[column.key])) %></span>
+                    <% } else if (column.key === 'nome' || column.key === 'razaoSocial') { %><span class="record-primary"><%= record[column.key] %></span>
+                    <% } else { %><span class="cell-value"><%= record[column.key] == null || record[column.key] === '' ? '—' : record[column.key] %></span><% } %>
+                  </td>
+                <% }) %>
+                <td class="actions-cell">
+                  <a class="btn btn-sm btn-edit" href="<%= config.path %>/<%= record.id %>/editar"><i class="bi bi-pencil-square me-1" aria-hidden="true"></i>Editar</a>
+                  <form action="<%= config.path %>/<%= record.id %>/excluir" method="POST" class="d-inline" data-confirm="Deseja realmente excluir este registro? Esta ação não pode ser desfeita.">
+                    <button class="btn btn-sm btn-delete" type="submit"><i class="bi bi-trash3 me-1" aria-hidden="true"></i>Excluir</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <div class="data-panel-footer"><span><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Os dados exibidos são os registros encontrados no armazenamento atual.</span><span><%= records.length %> <%= records.length === 1 ? 'registro' : 'registros' %></span></div>
+    <% } else { %>
+      <div class="empty-state"><div class="empty-state-icon"><i class="bi <%= config.icon %>" aria-hidden="true"></i></div><h3><%= query ? 'Nenhum resultado encontrado' : 'Ainda não há registros' %></h3><p><%= query ? 'Tente pesquisar usando outro termo.' : `Cadastre o primeiro ${config.singular} para começar a organizar esta área.` %></p>
+        <% if (query) { %><a class="btn btn-outline-secondary" href="<%= config.path %>">Limpar pesquisa</a><% } else { %><a class="btn btn-primary" href="<%= config.path %>/cadastro"><i class="bi bi-plus-lg me-2" aria-hidden="true"></i>Cadastrar <%= config.singular %></a><% } %>
+      </div>
+    <% } %>
+  </section>
+</main>
+<%- include('../partials/foot') %>

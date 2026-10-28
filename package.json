@@ -1,0 +1,30 @@
+{
+  "name": "sistema-cadastro-ejs",
+  "version": "1.1.0",
+  "description": "Sistema de Cadastro com CRUD em Node.js, Express, EJS e Bootstrap",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "express",
+    "ejs",
+    "nodejs",
+    "crud",
+    "bootstrap"
+  ],
+  "author": "Guilherme Andraz e Pedro Ailton",
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

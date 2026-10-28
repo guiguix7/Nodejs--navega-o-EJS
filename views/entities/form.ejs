@@ -1,0 +1,30 @@
+<%- include('../partials/head', { title: pageTitle }) %>
+<%- include('../partials/nav') %>
+<main class="container page-shell form-shell">
+  <nav aria-label="breadcrumb" class="page-breadcrumb"><a href="/"><i class="bi bi-house-door me-1" aria-hidden="true"></i>Início</a><i class="bi bi-chevron-right" aria-hidden="true"></i><a href="<%= config.path %>"><%= config.title %></a><i class="bi bi-chevron-right" aria-hidden="true"></i><span><%= mode === 'edit' ? 'Editar' : 'Novo cadastro' %></span></nav>
+  <section class="form-intro"><div class="heading-icon"><i class="bi <%= config.icon %>" aria-hidden="true"></i></div><div><span class="eyebrow"><%= mode === 'edit' ? 'ATUALIZAÇÃO DE DADOS' : 'NOVO REGISTRO' %></span><h1><%= mode === 'edit' ? `Editar ${config.singular}` : `Cadastrar ${config.singular}` %></h1><p><%= config.description %></p></div></section>
+
+  <section class="form-panel">
+    <div class="form-panel-header"><h2><i class="bi bi-card-checklist me-2" aria-hidden="true"></i>Informações do cadastro</h2><p>Campos marcados com <span class="required-mark">*</span> são obrigatórios.</p></div>
+    <% if (errors.length) { %>
+      <div class="alert alert-danger validation-alert" role="alert"><div class="fw-semibold mb-1"><i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>Confira os dados informados:</div><ul class="mb-0"><% errors.forEach((error) => { %><li><%= error %></li><% }) %></ul></div>
+    <% } %>
+    <form action="<%= mode === 'edit' ? `${config.path}/${formValues.id}/editar` : config.path %>" method="POST" novalidate>
+      <div class="row g-4">
+        <% config.fields.forEach((field) => { %>
+          <div class="<%= field.fullWidth ? 'col-12' : 'col-12 col-md-6' %>">
+            <label class="form-label" for="field-<%= field.name %>"><%= field.label %><% if (field.required) { %> <span class="required-mark" aria-hidden="true">*</span><% } %></label>
+            <% if (field.type === 'textarea') { %>
+              <textarea class="form-control" id="field-<%= field.name %>" name="<%= field.name %>" rows="4" placeholder="<%= field.placeholder || '' %>" maxlength="<%= field.maxLength || 1000 %>" <%= field.required ? 'required' : '' %> aria-required="<%= field.required ? 'true' : 'false' %>"><%= formValues[field.name] ?? '' %></textarea>
+            <% } else { %>
+              <input class="form-control" id="field-<%= field.name %>" name="<%= field.name %>" type="<%= field.type %>" value="<%= formValues[field.name] ?? '' %>" placeholder="<%= field.placeholder || '' %>" <%= field.required ? 'required' : '' %> <%= field.maxLength ? `maxlength="${field.maxLength}"` : '' %> <%= field.min !== undefined ? `min="${field.min}"` : '' %> <%= field.step ? `step="${field.step}"` : '' %> aria-required="<%= field.required ? 'true' : 'false' %>">
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+      <div class="form-actions"><a href="<%= config.path %>" class="btn btn-light border"><i class="bi bi-arrow-left me-2" aria-hidden="true"></i>Cancelar</a><button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle me-2" aria-hidden="true"></i><%= mode === 'edit' ? 'Salvar alterações' : 'Salvar cadastro' %></button></div>
+    </form>
+  </section>
+  <p class="form-tip"><i class="bi bi-lock me-2" aria-hidden="true"></i>Revise as informações antes de salvar para manter os cadastros corretos.</p>
+</main>
+<%- include('../partials/foot') %>

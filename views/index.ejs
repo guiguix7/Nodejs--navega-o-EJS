@@ -1,0 +1,48 @@
+<%- include('partials/head', { title: 'Painel inicial' }) %>
+<%- include('partials/nav') %>
+<main class="container page-shell home-shell">
+  <section class="hero-panel">
+    <div class="hero-copy">
+      <span class="eyebrow"><i class="bi bi-stars me-2" aria-hidden="true"></i>PAINEL ADMINISTRATIVO</span>
+      <h1>Organize seus cadastros <span>em um só lugar.</span></h1>
+      <p>Gerencie informações de categorias, clientes, fornecedores e produtos com uma navegação simples e centralizada.</p>
+      <a class="btn btn-primary btn-lg mt-2" href="/clientes"><i class="bi bi-arrow-right-circle me-2" aria-hidden="true"></i>Acessar cadastros</a>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="hero-art-backdrop"></div>
+      <div class="floating-card floating-card-top"><i class="bi bi-check2-circle"></i><span>Cadastro organizado</span></div>
+      <div class="dashboard-illustration">
+        <div class="illustration-top"><span></span><span></span><span></span></div>
+        <div class="illustration-content">
+          <div class="illustration-sidebar"><i class="bi bi-grid-fill"></i><i class="bi bi-people-fill"></i><i class="bi bi-box-seam-fill"></i></div>
+          <div class="illustration-main"><div class="illustration-line long"></div><div class="illustration-line short"></div><div class="illustration-stat-row"><span></span><span></span><span></span></div><div class="illustration-table"><i></i><i></i><i></i></div></div>
+        </div>
+      </div>
+      <div class="floating-card floating-card-bottom"><i class="bi bi-lightning-charge-fill"></i><span>Fluxo simplificado</span></div>
+    </div>
+  </section>
+
+  <section class="section-heading">
+    <div><span class="eyebrow">VISÃO GERAL</span><h2>Áreas do sistema</h2><p>Escolha um módulo para consultar ou gerenciar registros.</p></div>
+    <span class="section-chip"><i class="bi bi-shield-check me-1" aria-hidden="true"></i>4 módulos</span>
+  </section>
+  <section class="row g-4 module-grid" aria-label="Módulos de cadastro">
+    <% entities.forEach((entity) => { %>
+      <div class="col-12 col-sm-6 col-xl-3">
+        <article class="module-card">
+          <div class="module-card-top"><span class="module-icon"><i class="bi <%= entity.icon %>" aria-hidden="true"></i></span><span class="module-count"><%= counts[entity.key] %> <%= counts[entity.key] === 1 ? 'registro' : 'registros' %></span></div>
+          <h3><%= entity.title %></h3>
+          <p><%= entity.description %></p>
+          <a class="module-link" href="<%= entity.path %>">Abrir módulo <i class="bi bi-arrow-up-right ms-1" aria-hidden="true"></i></a>
+        </article>
+      </div>
+    <% }) %>
+  </section>
+
+  <section class="team-strip">
+    <div class="team-icon"><i class="bi bi-mortarboard-fill" aria-hidden="true"></i></div>
+    <div><span class="team-label">PROJETO ACADÊMICO</span><p><strong>Guilherme Andraz e Pedro Ailton</strong><span>Turma 2DS</span></p></div>
+    <span class="team-badge">Node.js + EJS</span>
+  </section>
+</main>
+<%- include('partials/foot') %>
