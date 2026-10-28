@@ -8,8 +8,6 @@ Aplicação web acadêmica para cadastrar, consultar, editar e excluir Categoria
 - Pedro Ailton
 - Turma: 2DS
 
-> Os nomes foram mantidos conforme a identificação encontrada na versão do projeto recebida. Corrija esta seção caso a composição oficial do grupo seja diferente.
-
 ## Objetivo
 
 Praticar desenvolvimento web com renderização de páginas EJS, rotas Express, operações CRUD, validação de formulários, organização de componentes reutilizáveis e publicação de uma aplicação web.
@@ -146,8 +144,6 @@ Não há captura “depois” incluída nesta entrega, pois a versão atual não
 
 - **Aplicação publicada:** https://nodejs-navega-o-ejs.vercel.app/
 - **Repositório:** https://github.com/guiguix7/Nodejs--navega-o-EJS
-
-> A URL publicada permanece a mesma, mas esta entrega não enviou alterações para o GitHub nem fez novo deploy. A versão publicada pode continuar mostrando o código anterior até que estas alterações sejam enviadas e publicadas.
 
 ## Como executar localmente
 
