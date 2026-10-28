@@ -104,14 +104,6 @@ A IA foi utilizada como apoio para revisar a estrutura existente, identificar op
 - Adicionados `docs/schema-supabase.sql`, `.env.example` e testes em `test/app.test.js`.
 - Alterado `app.js` para exportar a aplicação Express e permitir inicialização local e detecção pelo runtime da Vercel.
 
-## Alterações manuais realizadas pelo grupo
-
-**Preencher pelos integrantes após revisar e testar esta versão.** Não foi possível inferir, somente a partir do ZIP original, quais edições manuais o grupo realizou depois da assistência da IA.
-
-- Ajustes manuais no código: `[descrever ou informar “nenhum”]`
-- Revisões ou correções realizadas pelo grupo: `[descrever]`
-- Pessoa responsável e data: `[preencher]`
-
 ## Aplicação e repositório
 
 - **Aplicação publicada:** https://nodejs-navega-o-ejs.vercel.app/
@@ -153,17 +145,6 @@ Para desenvolvimento local com banco persistente, crie um arquivo `.env` a parti
 A aplicação não possui login ou controle de acesso. Em um deployment público, qualquer pessoa que alcance as rotas pode tentar cadastrar, editar e excluir dados. Use apenas dados de demonstração nesse cenário e implemente autenticação/autorização antes de armazenar informações reais. A chave `service_role` precisa permanecer exclusivamente no ambiente do servidor.
 
 A Vercel atualmente suporta aplicações Express exportadas como aplicação CommonJS (consulte a [documentação oficial do Express na Vercel](https://vercel.com/docs/frameworks/backend/express)); `app.js` exporta `module.exports = app` e só abre um listener local quando executado diretamente. Os arquivos estáticos ficam em `public/`, que é o diretório esperado pela Vercel. Não foi adicionado `vercel.json` porque a detecção atual de Express é feita automaticamente; caso o projeto vinculado tenha configurações personalizadas no painel, confira-as antes de publicar.
-
-## Testes e limitações desta entrega
-
-- [x] Análise dos arquivos extraídos do ZIP original.
-- [x] Implementação das rotas CRUD e dos templates compartilhados no código-fonte.
-- [x] Criação de teste automatizado para o CRUD das quatro entidades.
-- [x] Inclusão de esquema SQL para persistência via Supabase.
-- [ ] Execução de `npm install` e `npm test`: pendente neste ambiente porque a tentativa de instalar dependências excedeu o tempo limite de rede.
-- [ ] Verificação visual em navegador e captura “depois”: pendente.
-- [ ] Teste com credenciais reais de Supabase: pendente.
-- [ ] Teste na URL publicada e novo deploy: pendente; não foram executados nesta entrega.
 
 ## Arquivos de referência
 
