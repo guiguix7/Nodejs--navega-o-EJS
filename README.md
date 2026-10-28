@@ -45,6 +45,40 @@ Todas as entidades usam as rotas de listagem, cadastro, edição e exclusão, pr
 
 Também há pesquisa por texto nas listagens, mensagens de retorno, validação no servidor, telas de erro 404/500, confirmação antes de excluir e indicadores da página inicial baseados nas quantidades efetivamente lidas do armazenamento ativo. No layout de celular, a tabela fica dentro de uma área com rolagem horizontal controlada.
 
+## Pastas
+
+Nodejs--navega-o-EJS-main/
+├── app.js
+├── package.json
+├── package-lock.json
+├── .env.example
+├── .gitignore
+├── data/
+│   └── store.js
+├── docs/
+│   ├── evidencias/
+│   ├── prompt-utilizado.md
+│   └── schema-supabase.sql
+├── public/
+│   ├── css/
+│   │   └── app.css
+│   └── js/
+│       └── app.js
+├── routes/
+│   ├── categoriaRoutes.js
+│   ├── clienteRoutes.js
+│   ├── crudFactory.js
+│   ├── entityConfig.js
+│   ├── fornecedorRoutes.js
+│   └── produtoRoutes.js
+├── test/
+│   └── app.test.js
+└── views/
+    ├── entities/
+    ├── errors/
+    ├── partials/
+    └── index.ejs
+
 ## Uso da Inteligência Artificial
 
 A IA foi utilizada como apoio para revisar a estrutura existente, identificar operações CRUD incompletas, sugerir uma organização reutilizável de rotas e templates, melhorar a experiência visual, escrever validações, preparar testes e estruturar a documentação. As mudanças presentes nesta cópia são as alterações aplicadas no código durante esta execução; não significam que o GitHub ou a aplicação publicada tenham sido atualizados.
