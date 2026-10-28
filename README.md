@@ -47,6 +47,7 @@ Também há pesquisa por texto nas listagens, mensagens de retorno, validação 
 
 ## Pastas
 
+```text
 Nodejs--navega-o-EJS-main/
 ├── app.js
 ├── package.json
@@ -78,6 +79,7 @@ Nodejs--navega-o-EJS-main/
     ├── errors/
     ├── partials/
     └── index.ejs
+```
 
 ## Uso da Inteligência Artificial
 
