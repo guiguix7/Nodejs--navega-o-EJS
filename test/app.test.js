@@ -125,6 +125,8 @@ test('JSON inválido não é substituído silenciosamente', async () => {
 });
 
 test('cada entidade persiste no seu próprio JSON após reiniciar o servidor', async (t) => {
+  // O teste anterior grava JSON inválido de propósito; comece com uma área isolada.
+  await fs.rm(testDataDirectory, { recursive: true, force: true });
   const serverFor = () => app.listen(0, '127.0.0.1');
   const start = async () => {
     const server = serverFor();
