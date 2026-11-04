@@ -139,7 +139,7 @@ node --check app.js
 node --check data/store.js
 node --check routes/crudFactory.js
 ```
-Os testes automatizados cobrem o fluxo HTTP CRUD das quatro entidades, validação de obrigatórios, arquivos separados, operações simultâneas, preservação dos tipos numéricos, ID na edição, exclusão e JSON inválido. **Resultado pendente:** `npm test` não completou neste ambiente por ausência de `express` após falha/timeout de instalação.
+Os testes automatizados cobrem o fluxo HTTP CRUD das quatro entidades, validação de obrigatórios, arquivos separados, operações simultâneas, preservação dos tipos numéricos, ID na edição, exclusão, JSON inválido e persistência dos registros após reiniciar o servidor. Foi adicionado o workflow `.github/workflows/testes-crud-json.yml` para executar `npm ci`, `npm test` e verificações de sintaxe em pushes e pull requests. **Resultado pendente:** não foi possível executar `npm ci` neste ambiente porque o acesso à rede/DNS do GitHub e do registro npm está indisponível; a consulta de execuções do GitHub Actions ainda não retornou uma execução. Portanto, os testes estão preparados, mas não podem ser declarados aprovados até uma execução real.
 
 ## 18. Conclusão
 A migração demonstra como persistir dados estruturados em arquivos JSON separados por entidade, mantendo as operações CRUD reutilizáveis. Também evidencia que arquivos locais são simples para projetos pequenos e atividades acadêmicas, mas exigem cuidados com concorrência, integridade e ambiente de hospedagem. Em produção, o volume precisa ser persistente e compartilhado para que as alterações não sejam perdidas.
