@@ -4,9 +4,8 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 
-process.env.DATA_FILE = path.join(os.tmpdir(), `sistema-cadastro-test-${process.pid}.json`);
-delete process.env.SUPABASE_URL;
-delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+const testDataDirectory = path.join(os.tmpdir(), `sistema-cadastro-json-test-${process.pid}`);
+process.env.DATA_DIR = testDataDirectory;
 
 const app = require('../app');
 const store = require('../data/store');
@@ -30,7 +29,7 @@ test('página inicial e CRUD completo das quatro entidades', async (t) => {
 
   t.after(async () => {
     await new Promise((resolve) => server.close(resolve));
-    await fs.rm(process.env.DATA_FILE, { force: true });
+    await fs.rm(testDataDirectory, { recursive: true, force: true });
   });
 
   const home = await fetch(base);
@@ -97,4 +96,30 @@ test('validação impede cadastro com campos obrigatórios vazios', async (t) =>
   });
   assert.equal(response.status, 422);
   assert.match(await response.text(), /Preencha o campo/);
+});
+
+
+test('arquivos JSON individuais, concorrência e preservação dos tipos', async () => {
+  const store = require('../data/store');
+  const created = await Promise.all(Array.from({ length: 12 }, (_, index) =>
+    store.create('produtos', { nome: `Produto ${index}`, descricao: 'Teste', preco: 12.5, estoque: index, categoria: 'Teste' })
+  ));
+  assert.equal(new Set(created.map((record) => record.id)).size, 12);
+  const file = path.join(testDataDirectory, 'produtos.json');
+  const persisted = JSON.parse(await fs.readFile(file, 'utf8'));
+  assert.equal(persisted.length, 12);
+  assert.equal(typeof persisted[0].preco, 'number');
+  assert.equal(typeof persisted[0].estoque, 'number');
+  const before = await store.get('produtos', created[0].id);
+  const updated = await store.update('produtos', before.id, { nome: 'Atualizado' });
+  assert.equal(updated.id, before.id);
+  assert.equal((await store.remove('produtos', before.id)), true);
+  assert.equal((await store.remove('produtos', before.id)), false);
+});
+
+test('JSON inválido não é substituído silenciosamente', async () => {
+  const store = require('../data/store');
+  const file = path.join(testDataDirectory, 'categorias.json');
+  await fs.writeFile(file, '{ JSON quebrado');
+  await assert.rejects(() => store.list('categorias'), /JSON inválido/);
 });

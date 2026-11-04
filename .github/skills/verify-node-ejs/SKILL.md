@@ -18,8 +18,8 @@ user-invocable: true
 
 ## Regras de seguranca
 
-- Nunca preencha ou imprima segredos de Supabase.
-- Use o armazenamento JSON temporario dos testes; nao altere `data/cadastros.json` manualmente para simular sucesso.
+- Os testes devem apontar `DATA_DIR` para uma pasta temporaria; nao altere os JSON reais do projeto durante os testes.
+- O armazenamento da atividade e exclusivamente composto pelos quatro arquivos JSON em `data/`.
 - Nao use dados pessoais reais.
 - Nao considere a inicializacao do servidor uma prova de que todas as rotas CRUD funcionam; `npm test` continua sendo obrigatorio.
 

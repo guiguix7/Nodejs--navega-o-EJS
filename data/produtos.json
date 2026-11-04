@@ -1,0 +1,4 @@
+[
+  { "id": 1, "nome": "Relogio", "descricao": "Relógio pra ver as horas", "preco": 3500, "estoque": 10, "categoria": "Horario" },
+  { "id": 2, "nome": "Fone de ouvido", "descricao": "Fone de ouvido para ouvir musicas", "preco": 245, "estoque": 30, "categoria": "Acessórios" }
+]

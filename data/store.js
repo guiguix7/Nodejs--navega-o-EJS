@@ -1,201 +1,119 @@
-const fs = require('fs/promises');
-const os = require('os');
-const path = require('path');
+const fs = require('node:fs/promises');
+const path = require('node:path');
 
 const definitions = {
-  categorias: {
-    table: 'sc_categorias', fields: { nome: 'nome' }
-  },
-  clientes: {
-    table: 'sc_clientes', fields: { nome: 'nome', email: 'email', telefone: 'telefone', cidade: 'cidade' }
-  },
-  fornecedores: {
-    table: 'sc_fornecedores', fields: { razaoSocial: 'razao_social', cnpj: 'cnpj', email: 'email', telefone: 'telefone', cidade: 'cidade' }
-  },
-  produtos: {
-    table: 'sc_produtos', fields: { nome: 'nome', descricao: 'descricao', preco: 'preco', estoque: 'estoque', categoria: 'categoria' }
-  }
+  categorias: 'categorias.json',
+  clientes: 'clientes.json',
+  fornecedores: 'fornecedores.json',
+  produtos: 'produtos.json'
 };
 
-const seeds = {
-  categorias: [
-    { id: 1, nome: 'Informática' },
-    { id: 2, nome: 'Escritório' },
-    { id: 3, nome: 'Acessórios' }
-  ],
-  clientes: [
-    { id: 1, nome: 'Ana Souza', email: 'ana@email.com', telefone: '(11) 99999-1111', cidade: 'São Paulo' },
-    { id: 2, nome: 'Bruno Lima', email: 'bruno@email.com', telefone: '(21) 98888-2222', cidade: 'Rio de Janeiro' }
-  ],
-  fornecedores: [
-    { id: 1, razaoSocial: 'Amazon', cnpj: '6767676767', email: 'saboraidentro@email.com', telefone: '67 67676767', cidade: 'Rua Belterra 291 Santo Amaro Sp' },
-    { id: 2, razaoSocial: 'Mercado Preso', cnpj: '6767676767', email: 'emeailtuff@email.com', telefone: '67 676767', cidade: 'Rua Zé Pilintra 6742' }
-  ],
-  produtos: [
-    { id: 1, nome: 'Relogio', descricao: 'Relógio pra ver as horas', preco: 3500, estoque: 10, categoria: 'Horario' },
-    { id: 2, nome: 'Fone de ouvido', descricao: 'Fone de ouvido para ouvir musicas', preco: 245, estoque: 30, categoria: 'Acessórios' }
-  ]
-};
+// DATA_DIR permite isolar os testes sem tocar nos arquivos reais.
+const dataDirectory = path.resolve(process.env.DATA_DIR || __dirname);
+const queues = new Map();
 
-const hasSupabaseUrl = Boolean(process.env.SUPABASE_URL);
-const hasSupabaseKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
-const useRemoteDatabase = hasSupabaseUrl && hasSupabaseKey;
-const remoteConfigIncomplete = hasSupabaseUrl !== hasSupabaseKey;
-const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const storageFile = process.env.DATA_FILE || (process.env.VERCEL
-  ? path.join(os.tmpdir(), 'sistema-cadastro-dados.json')
-  : path.join(__dirname, 'cadastros.json'));
-let initPromise;
-let fileData;
-let writeQueue = Promise.resolve();
-
-async function remoteRequest(key, options = {}) {
-  const response = await fetch(`${supabaseUrl}/rest/v1/${definitions[key].table}${options.query || ''}`, {
-    method: options.method || 'GET',
-    headers: {
-      apikey: supabaseKey,
-      Authorization: `Bearer ${supabaseKey}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=representation'
-    },
-    body: options.body === undefined ? undefined : JSON.stringify(options.body)
-  });
-  const responseText = await response.text();
-  let data = [];
-  if (responseText) {
-    try { data = JSON.parse(responseText); }
-    catch { throw new Error(`Resposta inesperada do banco remoto (HTTP ${response.status}).`); }
-  }
-  if (!response.ok) {
-    const detail = data && typeof data === 'object' ? (data.message || data.details || data.hint) : '';
-    throw new Error(`Falha no banco remoto (HTTP ${response.status})${detail ? `: ${detail}` : ''}`);
-  }
-  return data;
+function fileFor(key) {
+  if (!Object.hasOwn(definitions, key)) throw new Error(`Entidade de armazenamento inválida: ${key}`);
+  return path.join(dataDirectory, definitions[key]);
 }
 
-function fromRemote(row, key) {
-  const result = { id: Number(row.id) };
-  for (const [property, column] of Object.entries(definitions[key].fields)) {
-    let value = row[column];
-    if (property === 'preco') value = Number(value);
-    result[property] = value;
-  }
-  return result;
-}
-
-function toRemote(values, key) {
-  const payload = {};
-  for (const [property, column] of Object.entries(definitions[key].fields)) payload[column] = values[property];
-  return payload;
-}
-
-async function initialize() {
-  if (remoteConfigIncomplete) {
-    throw new Error('Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY juntos, ou remova ambos para usar o armazenamento local.');
-  }
-  if (useRemoteDatabase) {
-    for (const key of Object.keys(definitions)) {
-      await remoteRequest(key, { query: '?select=id&limit=1' });
-    }
-    return;
-  }
-
+async function readRecords(key) {
+  const file = fileFor(key);
   try {
-    const content = await fs.readFile(storageFile, 'utf8');
-    fileData = JSON.parse(content);
-    for (const key of Object.keys(definitions)) {
-      if (!Array.isArray(fileData[key])) fileData[key] = [];
-    }
+    const content = await fs.readFile(file, 'utf8');
+    const records = JSON.parse(content);
+    if (!Array.isArray(records)) throw new Error(`O arquivo ${path.basename(file)} deve conter um array JSON.`);
+    return records;
   } catch (error) {
-    if (error.code !== 'ENOENT') throw error;
-    fileData = JSON.parse(JSON.stringify(seeds));
-    await persistFile();
+    if (error.code === 'ENOENT') {
+      await fs.mkdir(dataDirectory, { recursive: true });
+      // Migra dados do antigo cadastros.json apenas quando o arquivo individual não existe.
+      // O legado nunca é apagado nem substitui arquivos individuais já existentes.
+      const legacyFile = path.join(dataDirectory, 'cadastros.json');
+      let initial = [];
+      try {
+        const legacy = JSON.parse(await fs.readFile(legacyFile, 'utf8'));
+        if (legacy && Array.isArray(legacy[key])) initial = legacy[key];
+      } catch (legacyError) {
+        if (legacyError.code !== 'ENOENT' && !(legacyError instanceof SyntaxError)) throw legacyError;
+        if (legacyError instanceof SyntaxError) throw new Error(`JSON legado inválido em cadastros.json: ${legacyError.message}`);
+      }
+      try { await fs.writeFile(file, `${JSON.stringify(initial, null, 2)}\n`, { flag: 'wx' }); }
+      catch (writeError) { if (writeError.code !== 'EEXIST') throw writeError; }
+      return readRecords(key);
+    }
+    if (error instanceof SyntaxError) throw new Error(`JSON inválido em ${path.basename(file)}: ${error.message}`);
+    throw error;
   }
 }
 
-async function ensureInitialized() {
-  if (!initPromise) {
-    initPromise = initialize().catch((error) => {
-      initPromise = null;
-      throw error;
-    });
+async function writeRecords(key, records) {
+  const file = fileFor(key);
+  await fs.mkdir(dataDirectory, { recursive: true });
+  const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
+  try {
+    await fs.writeFile(temporary, `${JSON.stringify(records, null, 2)}\n`, { encoding: 'utf8', flag: 'wx' });
+    await fs.rename(temporary, file);
+  } catch (error) {
+    await fs.rm(temporary, { force: true }).catch(() => {});
+    throw error;
   }
-  return initPromise;
 }
 
-function persistFile() {
-  writeQueue = writeQueue.catch(() => {}).then(async () => {
-    await fs.mkdir(path.dirname(storageFile), { recursive: true });
-    await fs.writeFile(storageFile, JSON.stringify(fileData, null, 2), 'utf8');
-  });
-  return writeQueue;
+function serialize(key, operation) {
+  const previous = queues.get(key) || Promise.resolve();
+  const current = previous.catch(() => {}).then(operation);
+  queues.set(key, current);
+  return current.finally(() => { if (queues.get(key) === current) queues.delete(key); });
 }
-
 
 async function list(key) {
-  await ensureInitialized();
-  if (useRemoteDatabase) {
-    const rows = await remoteRequest(key, { query: '?select=*&order=id.asc' });
-    return rows.map((row) => fromRemote(row, key));
-  }
-  return fileData[key].map((item) => ({ ...item }));
+  await (queues.get(key) || Promise.resolve()).catch(() => {});
+  return (await readRecords(key)).map((record) => ({ ...record }));
 }
 
 async function get(key, id) {
-  await ensureInitialized();
-  if (useRemoteDatabase) {
-    const rows = await remoteRequest(key, { query: `?select=*&id=eq.${id}&limit=1` });
-    return rows.length ? fromRemote(rows[0], key) : null;
-  }
-  const item = fileData[key].find((record) => record.id === id);
-  return item ? { ...item } : null;
+  const records = await list(key);
+  const record = records.find((item) => Number(item.id) === Number(id));
+  return record ? { ...record } : null;
 }
 
 async function create(key, values) {
-  await ensureInitialized();
-  if (useRemoteDatabase) {
-    const rows = await remoteRequest(key, { method: 'POST', body: toRemote(values, key) });
-    if (!rows.length) throw new Error('O banco remoto não retornou o registro criado.');
-    return fromRemote(rows[0], key);
-  }
-  const nextId = fileData[key].reduce((max, item) => Math.max(max, item.id), 0) + 1;
-  const record = { id: nextId, ...values };
-  fileData[key].push(record);
-  await persistFile();
-  return { ...record };
+  return serialize(key, async () => {
+    const records = await readRecords(key);
+    const nextId = records.reduce((max, record) => Math.max(max, Number(record.id) || 0), 0) + 1;
+    const record = { id: nextId, ...values };
+    records.push(record);
+    await writeRecords(key, records);
+    return { ...record };
+  });
 }
 
 async function update(key, id, values) {
-  await ensureInitialized();
-  if (useRemoteDatabase) {
-    const rows = await remoteRequest(key, { method: 'PATCH', query: `?id=eq.${id}`, body: toRemote(values, key) });
-    return rows.length ? fromRemote(rows[0], key) : null;
-  }
-  const index = fileData[key].findIndex((record) => record.id === id);
-  if (index === -1) return null;
-  fileData[key][index] = { id, ...values };
-  await persistFile();
-  return { ...fileData[key][index] };
+  return serialize(key, async () => {
+    const records = await readRecords(key);
+    const index = records.findIndex((record) => Number(record.id) === Number(id));
+    if (index < 0) return null;
+    records[index] = { ...records[index], ...values, id: records[index].id };
+    await writeRecords(key, records);
+    return { ...records[index] };
+  });
 }
 
 async function remove(key, id) {
-  await ensureInitialized();
-  if (useRemoteDatabase) {
-    const rows = await remoteRequest(key, { method: 'DELETE', query: `?id=eq.${id}&select=id` });
-    return rows.length > 0;
-  }
-  const index = fileData[key].findIndex((record) => record.id === id);
-  if (index === -1) return false;
-  fileData[key].splice(index, 1);
-  await persistFile();
-  return true;
+  return serialize(key, async () => {
+    const records = await readRecords(key);
+    const index = records.findIndex((record) => Number(record.id) === Number(id));
+    if (index < 0) return false;
+    records.splice(index, 1);
+    await writeRecords(key, records);
+    return true;
+  });
 }
 
 async function counts() {
-  const keys = Object.keys(definitions);
-  const values = await Promise.all(keys.map(async (key) => [key, (await list(key)).length]));
-  return Object.fromEntries(values);
+  const entries = await Promise.all(Object.keys(definitions).map(async (key) => [key, (await list(key)).length]));
+  return Object.fromEntries(entries);
 }
 
-module.exports = { list, get, create, update, remove, counts, usesDatabase: useRemoteDatabase };
+module.exports = { list, get, create, update, remove, counts, dataDirectory, usesDatabase: false };

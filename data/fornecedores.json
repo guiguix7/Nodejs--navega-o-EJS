@@ -1,0 +1,4 @@
+[
+  { "id": 1, "razaoSocial": "Amazon", "cnpj": "6767676767", "email": "saboraidentro@email.com", "telefone": "67 67676767", "cidade": "Rua Belterra 291 Santo Amaro Sp" },
+  { "id": 2, "razaoSocial": "Mercado Preso", "cnpj": "6767676767", "email": "emeailtuff@email.com", "telefone": "67 676767", "cidade": "Rua Zé Pilintra 6742" }
+]

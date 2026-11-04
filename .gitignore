@@ -3,5 +3,4 @@
 .env
 .env.*
 !.env.example
-/data/cadastros.json
-.vercel
+/vercel
