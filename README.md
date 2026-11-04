@@ -103,7 +103,7 @@ A análise encontrou arrays de demonstração e um armazenamento único `cadastr
 1. **Persistência e concorrência:** múltiplas operações poderiam calcular o mesmo próximo ID ou sobrescrever gravações. Foi adicionada uma fila por entidade e gravação por arquivo temporário.
 2. **Integridade:** JSON malformado não pode virar silenciosamente `[]`. A leitura agora informa o arquivo inválido.
 3. **Hospedagem:** o sistema de arquivos de uma Vercel Function é majoritariamente somente leitura, com `/tmp` temporário; isso não atende à persistência durável exigida.
-4. **Execução dos testes neste ambiente:** a instalação das dependências não foi concluída (tempo limite e pacote ausente no cache), portanto `npm test` não pôde ser validado integralmente neste ambiente. O erro observado foi `Cannot find module 'express'`, não uma falha assertiva do CRUD.
+4. **Isolamento dos testes:** o teste de persistência após reinicialização inicialmente reutilizava o JSON inválido criado pelo teste anterior. A suíte foi corrigida para limpar e recriar o diretório temporário antes desse cenário. A execução seguinte passou integralmente.
 
 ## 14. Ajustes feitos manualmente pelos integrantes
 [PREENCHER PELOS INTEGRANTES — registrar somente ajustes realmente realizados manualmente, com arquivo e descrição.]
@@ -139,7 +139,7 @@ node --check app.js
 node --check data/store.js
 node --check routes/crudFactory.js
 ```
-Os testes automatizados cobrem o fluxo HTTP CRUD das quatro entidades, validação de obrigatórios, arquivos separados, operações simultâneas, preservação dos tipos numéricos, ID na edição, exclusão, JSON inválido e persistência dos registros após reiniciar o servidor. Foi adicionado o workflow `.github/workflows/testes-crud-json.yml` para executar `npm ci`, `npm test` e verificações de sintaxe em pushes e pull requests. **Resultado pendente:** não foi possível executar `npm ci` neste ambiente porque o acesso à rede/DNS do GitHub e do registro npm está indisponível; a consulta de execuções do GitHub Actions ainda não retornou uma execução. Portanto, os testes estão preparados, mas não podem ser declarados aprovados até uma execução real.
+Os testes automatizados cobrem o fluxo HTTP CRUD das quatro entidades, validação de obrigatórios, arquivos separados, operações simultâneas, preservação dos tipos numéricos, ID na edição, exclusão, JSON inválido e persistência dos registros após reiniciar o servidor. Foi adicionado o workflow `.github/workflows/testes-crud-json.yml` para executar `npm ci`, `npm test` e verificações de sintaxe em pushes e pull requests. **Resultado verificado em 04/11/2026 pelo GitHub Actions:** `npm ci` concluído; `npm test` aprovado com **5 testes, 5 aprovados e 0 falhas**; as três verificações `node --check` também concluíram com sucesso. Execução: [Testes do CRUD JSON — execução aprovada](https://github.com/guiguix7/Nodejs--navega-o-EJS/actions/runs/41884292744). O `npm ci` reportou 7 vulnerabilidades nas dependências (6 moderadas e 1 alta); elas não impediram os testes, mas devem ser avaliadas separadamente com `npm audit` antes de uma publicação de produção.
 
 ## 18. Conclusão
 A migração demonstra como persistir dados estruturados em arquivos JSON separados por entidade, mantendo as operações CRUD reutilizáveis. Também evidencia que arquivos locais são simples para projetos pequenos e atividades acadêmicas, mas exigem cuidados com concorrência, integridade e ambiente de hospedagem. Em produção, o volume precisa ser persistente e compartilhado para que as alterações não sejam perdidas.
