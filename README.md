@@ -71,7 +71,7 @@ Se `cadastros.json` legado existir no diretório de dados e o JSON individual ai
 ## 8. Prompt utilizado
 O prompt anterior, que orientou a finalização do CRUD e o redesign, está documentado integralmente em [`docs/prompt-utilizado.md`](docs/prompt-utilizado.md).
 
-O novo prompt de migração é o **MASTER PROMPT — MIGRAÇÃO DO CRUD PARA ARQUIVOS JSON**, enviado pelos integrantes nesta conversa. Para evitar afirmar que um texto foi transcrito integralmente sem ter sido arquivado automaticamente, a cópia literal desse prompt ainda precisa ser inserida em [`docs/prompt-migracao-json.md`](docs/prompt-migracao-json.md). O conteúdo original permanece disponível no histórico da conversa utilizado na atividade.
+O prompt completo da migração está transcrito em [`docs/prompt-migracao-json.md`](docs/prompt-migracao-json.md). Esse arquivo contém a instrução integral usada para orientar a análise, implementação, testes e documentação desta atividade.
 
 ## 9. Uso da Inteligência Artificial
 A IA foi orientada a examinar a arquitetura existente antes de alterar o armazenamento, manter o CRUD compartilhado, transferir os registros de demonstração, criar arquivos separados, testar as operações e documentar as limitações da hospedagem. A implementação foi feita sobre o projeto recebido em ZIP, sem criar outra aplicação.
