@@ -123,3 +123,61 @@ test('JSON inválido não é substituído silenciosamente', async () => {
   await fs.writeFile(file, '{ JSON quebrado');
   await assert.rejects(() => store.list('categorias'), /JSON inválido/);
 });
+
+test('cada entidade persiste no seu próprio JSON após reiniciar o servidor', async (t) => {
+  const serverFor = () => app.listen(0, '127.0.0.1');
+  const start = async () => {
+    const server = serverFor();
+    await new Promise((resolve) => server.once('listening', resolve));
+    return { server, base: `http://127.0.0.1:${server.address().port}` };
+  };
+  const stop = (server) => new Promise((resolve, reject) =>
+    server.close((error) => error ? reject(error) : resolve())
+  );
+
+  const expectedFiles = {
+    categorias: 'categorias.json',
+    clientes: 'clientes.json',
+    fornecedores: 'fornecedores.json',
+    produtos: 'produtos.json'
+  };
+  const createdIds = {};
+
+  let running = await start();
+  try {
+    for (const [key, config] of Object.entries(entities)) {
+      const values = { ...examples[key] };
+      const response = await fetch(`${running.base}${config.path}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: body(values),
+        redirect: 'manual'
+      });
+      assert.equal(response.status, 302, `${key}: cadastro HTTP deveria persistir`);
+
+      const records = JSON.parse(await fs.readFile(path.join(testDataDirectory, expectedFiles[key]), 'utf8'));
+      const field = Object.keys(values)[0];
+      const saved = records.find((record) => record[field] === values[field]);
+      assert.ok(saved, `${key}: registro deveria estar no JSON exclusivo da entidade`);
+      createdIds[key] = saved.id;
+    }
+  } finally {
+    await stop(running.server);
+  }
+
+  // Um novo servidor lê os dados do disco, sem depender do estado da instância anterior.
+  running = await start();
+  try {
+    for (const [key, config] of Object.entries(entities)) {
+      const response = await fetch(running.base + config.path);
+      assert.equal(response.status, 200);
+      const html = await response.text();
+      const expected = Object.values(examples[key])[0];
+      assert.ok(html.includes(String(expected)), `${key}: registro deveria continuar listado após reiniciar o servidor`);
+      assert.ok(Number.isInteger(createdIds[key]));
+    }
+  } finally {
+    await stop(running.server);
+    await fs.rm(testDataDirectory, { recursive: true, force: true });
+  }
+});
