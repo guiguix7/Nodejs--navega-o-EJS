@@ -1,0 +1,29 @@
+name: Testes do CRUD JSON
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Instalar dependências
+        run: npm ci
+      - name: Executar testes automatizados
+        run: npm test
+      - name: Verificar sintaxe
+        run: |
+          node --check app.js
+          node --check data/store.js
+          node --check routes/crudFactory.js
